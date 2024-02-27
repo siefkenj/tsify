@@ -1,23 +1,31 @@
 use proc_macro2::TokenStream;
 use quote::quote;
+use syn::parse_quote;
 
 use crate::{
-    attrs::TypeGenerationConfig, comments::extract_doc_comments, ctxt::Ctxt, decl::TsTypeAliasDecl,
+    attrs::TsifyContainerAttrs, comments::extract_doc_comments, ctxt::Ctxt, decl::TsTypeAliasDecl,
     typescript::TsType,
 };
 
-pub fn expend(item: syn::ItemType) -> syn::Result<TokenStream> {
+pub fn expand(args: proc_macro2::TokenStream, item: syn::ItemType) -> syn::Result<TokenStream> {
     let ctxt = Ctxt::new();
 
-    let type_ann = TsType::from_syn_type(&TypeGenerationConfig::default(), item.ty.as_ref());
+    let attribute = parse_quote!(#[tsify(#args)]);
+
+    let attrs = TsifyContainerAttrs::from_attrs(&[attribute], None)?;
+
+    let type_ann = TsType::from_syn_type(&attrs.ty_config, item.ty.as_ref());
 
     let decl = TsTypeAliasDecl {
-        id: item.ident.to_string(),
+        id: attrs.ty_config.format_name(item.ident.to_string()),
         export: true,
         type_params: item
             .generics
             .type_params()
-            .map(|ty| ty.ident.to_string())
+            // While strictly speaking we shouldn't need to suffix the type parameters, the
+            // type parsing code doesn't know if the type its looking at is referencing this
+            // type's generic or some other type. So we just suffix everything
+            .map(|ty| attrs.ty_config.format_name(ty.ident.to_string()))
             .collect(),
         type_ann,
         comments: extract_doc_comments(&item.attrs),

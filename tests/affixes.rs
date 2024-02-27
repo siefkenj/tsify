@@ -43,6 +43,7 @@ fn test_prefix() {
 
 #[test]
 fn test_suffix() {
+    #[tsify::declare(type_suffix = "Special")]
     type MyType = u32;
 
     #[derive(Tsify)]
