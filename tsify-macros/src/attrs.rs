@@ -32,7 +32,10 @@ impl TypeGenerationConfig {
 }
 
 impl TsifyContainerAttrs {
-    pub fn from_attrs(attribute_list: &[syn::Attribute], data: Option<&syn::Data>) -> syn::Result<Self> {
+    pub fn from_attrs(
+        attribute_list: &[syn::Attribute],
+        data: Option<&syn::Data>,
+    ) -> syn::Result<Self> {
         let mut attrs = Self {
             into_wasm_abi: false,
             from_wasm_abi: false,
@@ -42,9 +45,15 @@ impl TsifyContainerAttrs {
         };
 
         for attr in attribute_list {
-            let path_segments: Vec<String> = attr.path().segments.iter().map(|seg| seg.ident.to_string()).collect();
+            let path_segments: Vec<String> = attr
+                .path()
+                .segments
+                .iter()
+                .map(|seg| seg.ident.to_string())
+                .collect();
             let is_tsify = attr.path().is_ident("tsify");
-            let is_declare = attr.path().is_ident("declare") || path_segments == ["tsify", "declare"];
+            let is_declare =
+                attr.path().is_ident("declare") || path_segments == ["tsify", "declare"];
             if !(is_tsify || is_declare) {
                 continue;
             }
