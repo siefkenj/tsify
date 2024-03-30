@@ -1,12 +1,15 @@
 [package]
 name = "tsify-next"
-version = "0.4.5"
+version = "0.5.0"
 edition = "2021"
-authors = ["Madono Haru <madonoharu@gmail.com>"]
+authors = [
+  "Madono Haru <madonoharu@gmail.com>",
+  "Jason Siefken <siefkenj@gmail.com>"
+]
 license = "MIT OR Apache-2.0"
-description = "Tsify is a library for generating TypeScript definitions from rust code."
-repository = "https://github.com/madonoharu/tsify"
-homepage = "https://github.com/madonoharu/tsify"
+description = "Tsify-next is a library for generating TypeScript definitions from rust code."
+repository = "https://github.com/siefkenj/tsify"
+homepage = "https://github.com/siefkenj/tsify"
 keywords = ["wasm", "wasm-bindgen", "typescript"]
 categories = ["wasm"]
 
@@ -32,7 +35,12 @@ wasm-bindgen-test = "0.3"
 [features]
 default = ["json"]
 wasm-bindgen = ["tsify-next-macros/wasm-bindgen", "dep:wasm-bindgen"]
-js = ["wasm-bindgen", "tsify-next-macros/js", "dep:serde", "dep:serde-wasm-bindgen"]
+js = [
+  "wasm-bindgen",
+  "tsify-next-macros/js",
+  "dep:serde",
+  "dep:serde-wasm-bindgen"
+]
 json = [
   "wasm-bindgen",
   "tsify-next-macros/json",
