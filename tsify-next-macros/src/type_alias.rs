@@ -6,7 +6,7 @@ use crate::{
     typescript::TsType,
 };
 
-pub fn expend(item: syn::ItemType) -> syn::Result<TokenStream> {
+pub fn expand(item: syn::ItemType) -> syn::Result<TokenStream> {
     let ctxt = Ctxt::new();
 
     let type_ann = TsType::from_syn_type(&TypeGenerationConfig::default(), item.ty.as_ref());
