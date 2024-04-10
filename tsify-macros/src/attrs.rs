@@ -32,17 +32,29 @@ impl TypeGenerationConfig {
 }
 
 impl TsifyContainerAttrs {
-    pub fn from_derive_input(input: &syn::DeriveInput) -> syn::Result<Self> {
+    pub fn from_attrs(
+        attribute_list: &[syn::Attribute],
+        data: Option<&syn::Data>,
+    ) -> syn::Result<Self> {
         let mut attrs = Self {
             into_wasm_abi: false,
             from_wasm_abi: false,
             namespace: false,
             ty_config: TypeGenerationConfig::default(),
-            comments: extract_doc_comments(&input.attrs),
+            comments: extract_doc_comments(&attribute_list),
         };
 
-        for attr in &input.attrs {
-            if !attr.path().is_ident("tsify") {
+        for attr in attribute_list {
+            let path_segments: Vec<String> = attr
+                .path()
+                .segments
+                .iter()
+                .map(|seg| seg.ident.to_string())
+                .collect();
+            let is_tsify = attr.path().is_ident("tsify");
+            let is_declare =
+                attr.path().is_ident("declare") || path_segments == ["tsify", "declare"];
+            if !(is_tsify || is_declare) {
                 continue;
             }
 
@@ -64,7 +76,7 @@ impl TsifyContainerAttrs {
                 }
 
                 if meta.path.is_ident("namespace") {
-                    if !matches!(input.data, syn::Data::Enum(_)) {
+                    if !matches!(data, Some(syn::Data::Enum(_))) {
                         return Err(meta.error("#[tsify(namespace)] can only be used on enums"));
                     }
                     if attrs.namespace {
