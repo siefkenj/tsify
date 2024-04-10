@@ -57,7 +57,7 @@ impl TsTypeLit {
 
         self.members
             .into_iter()
-            .chain(other.members.into_iter())
+            .chain(other.members)
             .fold(init, |mut acc, m| {
                 if let Some(acc_m) = acc.get_mut(&m.key) {
                     let mut tmp = TsType::NULL;
@@ -655,7 +655,7 @@ impl TsTypeElement {
     pub fn to_string_with_indent(&self, indent: usize) -> String {
         let out = self.to_string();
         let indent_str = " ".repeat(indent);
-        out.split("\n")
+        out.split('\n')
             .map(|line| format!("{}{}", indent_str, line))
             .collect::<Vec<_>>()
             .join("\n")
