@@ -50,10 +50,9 @@ jobs:
             - name: Add cargo-expand
               run: cargo install cargo-expand
 
+            # Run the ./test.sh script
             - name: Test
-              uses: actions-rs/cargo@v1
-              with:
-                  command: test
+              run: ./test.sh
     lint:
         name: Lint
         runs-on: ubuntu-latest
