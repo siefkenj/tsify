@@ -1,9 +1,9 @@
 mod attrs;
 mod comments;
 mod container;
-mod ctxt;
 mod decl;
 mod derive;
+mod error_tracker;
 mod parser;
 mod type_alias;
 mod typescript;
@@ -26,6 +26,7 @@ fn declare_impl(
     }
 }
 
+/// The `declare` macro, used in `#[declare]` annotations.
 #[proc_macro_attribute]
 pub fn declare(
     args: proc_macro::TokenStream,
@@ -39,6 +40,7 @@ pub fn declare(
         .into()
 }
 
+/// The `Tsify` derive macro, used in `#[derive(Tsify, ...)]` annotations.
 #[proc_macro_derive(Tsify, attributes(tsify, serde))]
 pub fn derive_tsify(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let item: DeriveInput = parse_macro_input!(input);

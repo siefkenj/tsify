@@ -44,6 +44,7 @@ pub fn extract_doc_comments(attrs: &[syn::Attribute]) -> Vec<String> {
         })
 }
 
+/// Output extracted doc comments as Typescript doc comments.
 pub fn write_doc_comments(
     f: &mut std::fmt::Formatter<'_>,
     comments: &Vec<String>,
@@ -61,6 +62,7 @@ pub fn write_doc_comments(
     write!(f, "{}", format_args!("/**\n{} */\n", comment))
 }
 
+/// Remove all comments from a `TsType::TypeLit`
 pub fn clean_comments(typ: &mut TsType) {
     if let TsType::TypeLit(ref mut lit) = typ {
         lit.members.iter_mut().for_each(|elem| {
