@@ -50,4 +50,5 @@ json = [
 ]
 
 [workspace]
-members = ["tsify-next-macros"]
+members = ["tsify-next-macros", "tests-e2e/*"]
+exclude = ["tests-e2e/reference_output"]
