@@ -94,7 +94,10 @@ fn expand_into_wasm_abi(cont: &Container) -> TokenStream {
 
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    let serde_where_clause = WhereClause { where_token: parse_quote!(where), predicates: parse_quote!(#ident #ty_generics: #serde_path::Serialize)};
+    let serde_where_clause = WhereClause {
+        where_token: parse_quote!(where),
+        predicates: parse_quote!(#ident #ty_generics: #serde_path::Serialize),
+    };
 
     quote! {
         impl #impl_generics IntoWasmAbi for #ident #ty_generics #where_clause {
