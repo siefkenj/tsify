@@ -86,15 +86,14 @@ fn expand_into_wasm_abi(cont: &Container) -> TokenStream {
     let ident = cont.ident();
     let serde_path = cont.serde_container.attrs.serde_path();
 
+    let borrowed_generics = cont.generics();
     let mut generics = cont.generics().clone();
-    generics.make_where_clause();
+    generics
+        .make_where_clause()
+        .predicates
+        .push(parse_quote!(#ident #borrowed_generics: #serde_path::Serialize));
 
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
-
-    let mut where_clause = where_clause.unwrap().clone();
-    where_clause
-        .predicates
-        .push(parse_quote!(#ident #ty_generics: #serde_path::Serialize));
 
     quote! {
         impl #impl_generics IntoWasmAbi for #ident #ty_generics #where_clause {
