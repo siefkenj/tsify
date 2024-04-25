@@ -52,7 +52,7 @@ pub fn expand(cont: &Container, decl: Decl) -> TokenStream {
             #use_serde
             use tsify_next::Tsify;
             use wasm_bindgen::{
-                convert::{FromWasmAbi, IntoWasmAbi, OptionFromWasmAbi, OptionIntoWasmAbi, RefFromWasmAbi},
+                convert::{FromWasmAbi, IntoWasmAbi, OptionFromWasmAbi, OptionIntoWasmAbi, RefFromWasmAbi, LongRefFromWasmAbi},
                 describe::WasmDescribe,
                 prelude::*,
             };
@@ -165,6 +165,12 @@ fn expand_from_wasm_abi(cont: &Container) -> TokenStream {
             }
         }
 
+        impl<T> ::core::borrow::Borrow<T> for SelfOwner<T> {
+            fn borrow(&self) -> &T {
+                &self.0
+            }
+        }
+
         impl #impl_generics RefFromWasmAbi for #ident #ty_generics #where_clause {
             type Abi = <JsType as RefFromWasmAbi>::Abi;
 
@@ -172,6 +178,20 @@ fn expand_from_wasm_abi(cont: &Container) -> TokenStream {
 
             unsafe fn ref_from_abi(js: Self::Abi) -> Self::Anchor {
                 let result = Self::from_js(&*JsType::ref_from_abi(js));
+                if let Err(err) = result {
+                    wasm_bindgen::throw_str(err.to_string().as_ref());
+                }
+                SelfOwner(result.unwrap_throw())
+            }
+        }
+
+        impl #impl_generics LongRefFromWasmAbi for #ident #ty_generics #where_clause {
+            type Abi = <JsType as LongRefFromWasmAbi>::Abi;
+
+            type Anchor = SelfOwner<Self>;
+
+            unsafe fn long_ref_from_abi(js: Self::Abi) -> Self::Anchor {
+                let result = Self::from_js(&JsType::from_abi(js));
                 if let Err(err) = result {
                     wasm_bindgen::throw_str(err.to_string().as_ref());
                 }
