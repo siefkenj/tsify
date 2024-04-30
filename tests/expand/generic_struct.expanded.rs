@@ -10,7 +10,7 @@ const _: () = {
     use wasm_bindgen::{
         convert::{
             FromWasmAbi, IntoWasmAbi, OptionFromWasmAbi, OptionIntoWasmAbi,
-            RefFromWasmAbi,
+            RefFromWasmAbi, LongRefFromWasmAbi,
         },
         describe::WasmDescribe, prelude::*,
     };
@@ -302,6 +302,11 @@ const _: () = {
             &self.0
         }
     }
+    impl<T> ::core::borrow::Borrow<T> for SelfOwner<T> {
+        fn borrow(&self) -> &T {
+            &self.0
+        }
+    }
     impl<T> RefFromWasmAbi for GenericStruct<T>
     where
         Self: _serde::de::DeserializeOwned,
@@ -310,6 +315,20 @@ const _: () = {
         type Anchor = SelfOwner<Self>;
         unsafe fn ref_from_abi(js: Self::Abi) -> Self::Anchor {
             let result = Self::from_js(&*JsType::ref_from_abi(js));
+            if let Err(err) = result {
+                wasm_bindgen::throw_str(err.to_string().as_ref());
+            }
+            SelfOwner(result.unwrap_throw())
+        }
+    }
+    impl<T> LongRefFromWasmAbi for GenericStruct<T>
+    where
+        Self: _serde::de::DeserializeOwned,
+    {
+        type Abi = <JsType as LongRefFromWasmAbi>::Abi;
+        type Anchor = SelfOwner<Self>;
+        unsafe fn long_ref_from_abi(js: Self::Abi) -> Self::Anchor {
+            let result = Self::from_js(&JsType::from_abi(js));
             if let Err(err) = result {
                 wasm_bindgen::throw_str(err.to_string().as_ref());
             }
@@ -326,7 +345,7 @@ const _: () = {
     use wasm_bindgen::{
         convert::{
             FromWasmAbi, IntoWasmAbi, OptionFromWasmAbi, OptionIntoWasmAbi,
-            RefFromWasmAbi,
+            RefFromWasmAbi, LongRefFromWasmAbi,
         },
         describe::WasmDescribe, prelude::*,
     };
@@ -619,6 +638,11 @@ const _: () = {
             &self.0
         }
     }
+    impl<T> ::core::borrow::Borrow<T> for SelfOwner<T> {
+        fn borrow(&self) -> &T {
+            &self.0
+        }
+    }
     impl<T> RefFromWasmAbi for GenericNewtype<T>
     where
         Self: _serde::de::DeserializeOwned,
@@ -627,6 +651,20 @@ const _: () = {
         type Anchor = SelfOwner<Self>;
         unsafe fn ref_from_abi(js: Self::Abi) -> Self::Anchor {
             let result = Self::from_js(&*JsType::ref_from_abi(js));
+            if let Err(err) = result {
+                wasm_bindgen::throw_str(err.to_string().as_ref());
+            }
+            SelfOwner(result.unwrap_throw())
+        }
+    }
+    impl<T> LongRefFromWasmAbi for GenericNewtype<T>
+    where
+        Self: _serde::de::DeserializeOwned,
+    {
+        type Abi = <JsType as LongRefFromWasmAbi>::Abi;
+        type Anchor = SelfOwner<Self>;
+        unsafe fn long_ref_from_abi(js: Self::Abi) -> Self::Anchor {
+            let result = Self::from_js(&JsType::from_abi(js));
             if let Err(err) = result {
                 wasm_bindgen::throw_str(err.to_string().as_ref());
             }
