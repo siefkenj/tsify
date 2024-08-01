@@ -18,8 +18,6 @@ pub struct TsifyContainerAttrs {
     pub namespace: bool,
     /// Information about how the type should be serialized.
     pub ty_config: TypeGenerationConfig,
-    /// Comments associated with the type. These will be written out to the generated Typescript.
-    pub comments: Vec<String>,
 }
 
 /// Configuration affecting how Typescript types are generated.
@@ -55,7 +53,6 @@ impl TsifyContainerAttrs {
             vector_from_wasm_abi: false,
             namespace: false,
             ty_config: TypeGenerationConfig::default(),
-            comments: extract_doc_comments(&input.attrs),
         };
 
         for attr in &input.attrs {
