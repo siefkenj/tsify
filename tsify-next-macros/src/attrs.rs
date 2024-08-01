@@ -87,7 +87,7 @@ impl TsifyContainerAttrs {
                     attrs.from_wasm_abi = true;
                     return Ok(());
                 }
-            
+
                 if meta.path.is_ident("vector_from_wasm_abi") {
                     if attrs.vector_from_wasm_abi {
                         return Err(meta.error("duplicate attribute"));
