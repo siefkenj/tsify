@@ -1,7 +1,5 @@
 use serde_derive_internals::ast::Field;
 
-use crate::comments::extract_doc_comments;
-
 /// Attributes that can be applied to a type decorated with `#[derive(Tsify)]`.
 /// E.g., through `#[tsify(into_wasm_abi)]`.
 #[derive(Debug, Default)]
@@ -173,7 +171,6 @@ impl TsifyContainerAttrs {
 pub struct TsifyFieldAttrs {
     pub type_override: Option<String>,
     pub optional: bool,
-    pub comments: Vec<String>,
 }
 
 impl TsifyFieldAttrs {
@@ -181,7 +178,6 @@ impl TsifyFieldAttrs {
         let mut attrs = Self {
             type_override: None,
             optional: false,
-            comments: extract_doc_comments(&field.original.attrs),
         };
 
         for attr in &field.original.attrs {
