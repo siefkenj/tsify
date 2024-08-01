@@ -38,6 +38,12 @@ const _: () = {
             <Self as Tsify>::JsType::describe()
         }
     }
+    impl<'a> WasmDescribeVector for Borrow<'a> {
+        #[inline]
+        fn describe_vector() {
+            <Self as Tsify>::JsType::describe_vector()
+        }
+    }
     impl<'a> IntoWasmAbi for Borrow<'a>
     where
         Borrow<'a>: _serde::Serialize,
@@ -120,6 +126,47 @@ const _: () = {
             }
         }
     }
+    impl<'a> VectorIntoWasmAbi for Borrow<'a>
+    where
+        Borrow<'a>: _serde::Serialize,
+    {
+        type Abi = <JsType as VectorIntoWasmAbi>::Abi;
+        #[inline]
+        fn vector_into_abi(vector: Box<[Self]>) -> Self::Abi {
+            let values = vector
+                .iter()
+                .map(|value| match value.into_js() {
+                    Ok(js) => js.into(),
+                    Err(err) => {
+                        let loc = core::panic::Location::caller();
+                        let msg = {
+                            let res = ::alloc::fmt::format(
+                                format_args!(
+                                    "(Converting type failed) {0} ({1}:{2}:{3})", err, loc
+                                    .file(), loc.line(), loc.column(),
+                                ),
+                            );
+                            res
+                        };
+                        {
+                            #[cold]
+                            #[track_caller]
+                            #[inline(never)]
+                            #[rustc_const_panic_str]
+                            #[rustc_do_not_const_check]
+                            const fn panic_cold_display<T: ::core::fmt::Display>(
+                                arg: &T,
+                            ) -> ! {
+                                ::core::panicking::panic_display(arg)
+                            }
+                            panic_cold_display(&msg);
+                        };
+                    }
+                })
+                .collect();
+            JsValue::vector_into_abi(values)
+        }
+    }
     impl<'a> FromWasmAbi for Borrow<'a>
     where
         Self: _serde::de::DeserializeOwned,
@@ -162,6 +209,25 @@ const _: () = {
                 wasm_bindgen::throw_str(err.to_string().as_ref());
             }
             SelfOwner(result.unwrap_throw())
+        }
+    }
+    impl<'a> VectorFromWasmAbi for Borrow<'a>
+    where
+        Self: _serde::de::DeserializeOwned,
+    {
+        type Abi = <JsType as VectorFromWasmAbi>::Abi;
+        #[inline]
+        unsafe fn vector_from_abi(js: Self::Abi) -> Box<[Self]> {
+            JsValue::vector_from_abi(js)
+                .into_iter()
+                .map(|value| {
+                    let result = Self::from_js(value);
+                    if let Err(err) = result {
+                        wasm_bindgen::throw_str(err.to_string().as_ref());
+                    }
+                    result.unwrap_throw()
+                })
+                .collect()
         }
     }
 };

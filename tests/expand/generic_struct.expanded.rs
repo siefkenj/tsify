@@ -36,6 +36,12 @@ const _: () = {
             <Self as Tsify>::JsType::describe()
         }
     }
+    impl<T> WasmDescribeVector for GenericStruct<T> {
+        #[inline]
+        fn describe_vector() {
+            <Self as Tsify>::JsType::describe_vector()
+        }
+    }
     impl<T> IntoWasmAbi for GenericStruct<T>
     where
         GenericStruct<T>: _serde::Serialize,
@@ -118,6 +124,47 @@ const _: () = {
             }
         }
     }
+    impl<T> VectorIntoWasmAbi for GenericStruct<T>
+    where
+        GenericStruct<T>: _serde::Serialize,
+    {
+        type Abi = <JsType as VectorIntoWasmAbi>::Abi;
+        #[inline]
+        fn vector_into_abi(vector: Box<[Self]>) -> Self::Abi {
+            let values = vector
+                .iter()
+                .map(|value| match value.into_js() {
+                    Ok(js) => js.into(),
+                    Err(err) => {
+                        let loc = core::panic::Location::caller();
+                        let msg = {
+                            let res = ::alloc::fmt::format(
+                                format_args!(
+                                    "(Converting type failed) {0} ({1}:{2}:{3})", err, loc
+                                    .file(), loc.line(), loc.column(),
+                                ),
+                            );
+                            res
+                        };
+                        {
+                            #[cold]
+                            #[track_caller]
+                            #[inline(never)]
+                            #[rustc_const_panic_str]
+                            #[rustc_do_not_const_check]
+                            const fn panic_cold_display<T: ::core::fmt::Display>(
+                                arg: &T,
+                            ) -> ! {
+                                ::core::panicking::panic_display(arg)
+                            }
+                            panic_cold_display(&msg);
+                        };
+                    }
+                })
+                .collect();
+            JsValue::vector_into_abi(values)
+        }
+    }
     impl<T> FromWasmAbi for GenericStruct<T>
     where
         Self: _serde::de::DeserializeOwned,
@@ -162,6 +209,25 @@ const _: () = {
             SelfOwner(result.unwrap_throw())
         }
     }
+    impl<T> VectorFromWasmAbi for GenericStruct<T>
+    where
+        Self: _serde::de::DeserializeOwned,
+    {
+        type Abi = <JsType as VectorFromWasmAbi>::Abi;
+        #[inline]
+        unsafe fn vector_from_abi(js: Self::Abi) -> Box<[Self]> {
+            JsValue::vector_from_abi(js)
+                .into_iter()
+                .map(|value| {
+                    let result = Self::from_js(value);
+                    if let Err(err) = result {
+                        wasm_bindgen::throw_str(err.to_string().as_ref());
+                    }
+                    result.unwrap_throw()
+                })
+                .collect()
+        }
+    }
 };
 #[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct GenericNewtype<T>(T);
@@ -196,6 +262,12 @@ const _: () = {
         #[inline]
         fn describe() {
             <Self as Tsify>::JsType::describe()
+        }
+    }
+    impl<T> WasmDescribeVector for GenericNewtype<T> {
+        #[inline]
+        fn describe_vector() {
+            <Self as Tsify>::JsType::describe_vector()
         }
     }
     impl<T> IntoWasmAbi for GenericNewtype<T>
@@ -280,6 +352,47 @@ const _: () = {
             }
         }
     }
+    impl<T> VectorIntoWasmAbi for GenericNewtype<T>
+    where
+        GenericNewtype<T>: _serde::Serialize,
+    {
+        type Abi = <JsType as VectorIntoWasmAbi>::Abi;
+        #[inline]
+        fn vector_into_abi(vector: Box<[Self]>) -> Self::Abi {
+            let values = vector
+                .iter()
+                .map(|value| match value.into_js() {
+                    Ok(js) => js.into(),
+                    Err(err) => {
+                        let loc = core::panic::Location::caller();
+                        let msg = {
+                            let res = ::alloc::fmt::format(
+                                format_args!(
+                                    "(Converting type failed) {0} ({1}:{2}:{3})", err, loc
+                                    .file(), loc.line(), loc.column(),
+                                ),
+                            );
+                            res
+                        };
+                        {
+                            #[cold]
+                            #[track_caller]
+                            #[inline(never)]
+                            #[rustc_const_panic_str]
+                            #[rustc_do_not_const_check]
+                            const fn panic_cold_display<T: ::core::fmt::Display>(
+                                arg: &T,
+                            ) -> ! {
+                                ::core::panicking::panic_display(arg)
+                            }
+                            panic_cold_display(&msg);
+                        };
+                    }
+                })
+                .collect();
+            JsValue::vector_into_abi(values)
+        }
+    }
     impl<T> FromWasmAbi for GenericNewtype<T>
     where
         Self: _serde::de::DeserializeOwned,
@@ -322,6 +435,25 @@ const _: () = {
                 wasm_bindgen::throw_str(err.to_string().as_ref());
             }
             SelfOwner(result.unwrap_throw())
+        }
+    }
+    impl<T> VectorFromWasmAbi for GenericNewtype<T>
+    where
+        Self: _serde::de::DeserializeOwned,
+    {
+        type Abi = <JsType as VectorFromWasmAbi>::Abi;
+        #[inline]
+        unsafe fn vector_from_abi(js: Self::Abi) -> Box<[Self]> {
+            JsValue::vector_from_abi(js)
+                .into_iter()
+                .map(|value| {
+                    let result = Self::from_js(value);
+                    if let Err(err) = result {
+                        wasm_bindgen::throw_str(err.to_string().as_ref());
+                    }
+                    result.unwrap_throw()
+                })
+                .collect()
         }
     }
 };
