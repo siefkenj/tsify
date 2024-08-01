@@ -8,8 +8,12 @@ use crate::comments::extract_doc_comments;
 pub struct TsifyContainerAttrs {
     /// Implement `IntoWasmAbi` for the type.
     pub into_wasm_abi: bool,
+    /// Implement `VectorIntoWasmAbi` for the type.
+    pub vector_into_wasm_abi: bool,
     /// Implement `FromWasmAbi` for the type.
     pub from_wasm_abi: bool,
+    /// Implement `VectorFromWasmAbi` for the type.
+    pub vector_from_wasm_abi: bool,
     /// Whether the type should be wrapped in a Typescript namespace.
     pub namespace: bool,
     /// Information about how the type should be serialized.
@@ -46,7 +50,9 @@ impl TsifyContainerAttrs {
     pub fn from_derive_input(input: &syn::DeriveInput) -> syn::Result<Self> {
         let mut attrs = Self {
             into_wasm_abi: false,
+            vector_into_wasm_abi: false,
             from_wasm_abi: false,
+            vector_from_wasm_abi: false,
             namespace: false,
             ty_config: TypeGenerationConfig::default(),
             comments: extract_doc_comments(&input.attrs),
@@ -66,11 +72,27 @@ impl TsifyContainerAttrs {
                     return Ok(());
                 }
 
+                if meta.path.is_ident("vector_into_wasm_abi") {
+                    if attrs.vector_into_wasm_abi {
+                        return Err(meta.error("duplicate attribute"));
+                    }
+                    attrs.vector_into_wasm_abi = true;
+                    return Ok(());
+                }
+
                 if meta.path.is_ident("from_wasm_abi") {
                     if attrs.from_wasm_abi {
                         return Err(meta.error("duplicate attribute"));
                     }
                     attrs.from_wasm_abi = true;
+                    return Ok(());
+                }
+            
+                if meta.path.is_ident("vector_from_wasm_abi") {
+                    if attrs.vector_from_wasm_abi {
+                        return Err(meta.error("duplicate attribute"));
+                    }
+                    attrs.vector_from_wasm_abi = true;
                     return Ok(());
                 }
 

@@ -76,6 +76,8 @@ Tsify container attributes
 -   `into_wasm_abi` implements `IntoWasmAbi` and `OptionIntoWasmAbi`. This can be converted directly from Rust to JS via `serde_json` or `serde-wasm-bindgen`.
 -   `from_wasm_abi` implements `FromWasmAbi` and `OptionFromWasmAbi`. This is the opposite operation of the above.
 -   `namespace` generates a namespace for the enum variants.
+- `vector_into_wasm_abi` implements `VectorIntoWasmAbi`. This is the vector version of `into_wasm_abi` and is needed when working with vectors.
+- `vector_from_wasm_abi` implements `VectorFromWasmAbi`. This is the opposite operation of the above.
 
 Tsify field attributes
 
