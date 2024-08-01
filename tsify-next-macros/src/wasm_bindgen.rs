@@ -26,12 +26,7 @@ pub fn expand(cont: &Container, decl: Decl) -> TokenStream {
                     <Self as Tsify>::JsType::describe()
                 }
             }
-        }
-    });
 
-    let wasm_vector_abi = attrs.vector_into_wasm_abi || attrs.vector_from_wasm_abi;
-    let wasm_describe_vector = wasm_vector_abi.then(|| {
-        quote! {
             impl #impl_generics WasmDescribeVector for #ident #ty_generics #where_clause {
                 #[inline]
                 fn describe_vector() {
@@ -51,16 +46,7 @@ pub fn expand(cont: &Container, decl: Decl) -> TokenStream {
     });
 
     let into_wasm_abi = attrs.into_wasm_abi.then(|| expand_into_wasm_abi(cont));
-
-    let vector_into_wasm_abi = attrs
-        .vector_into_wasm_abi
-        .then(|| expand_vector_into_wasm_abi(cont));
-
     let from_wasm_abi = attrs.from_wasm_abi.then(|| expand_from_wasm_abi(cont));
-
-    let vector_from_wasm_abi = attrs
-        .vector_from_wasm_abi
-        .then(|| expand_vector_from_wasm_abi(cont));
 
     let typescript_type = decl.id();
 
@@ -98,11 +84,8 @@ pub fn expand(cont: &Container, decl: Decl) -> TokenStream {
 
             #typescript_custom_section
             #wasm_describe
-            #wasm_describe_vector
             #into_wasm_abi
-            #vector_into_wasm_abi
             #from_wasm_abi
-            #vector_from_wasm_abi
         };
     }
 }
@@ -169,23 +152,7 @@ fn expand_into_wasm_abi(cont: &Container) -> TokenStream {
                 }
             }
         }
-    }
-}
 
-fn expand_vector_into_wasm_abi(cont: &Container) -> TokenStream {
-    let ident = cont.ident();
-    let serde_path = cont.serde_container.attrs.serde_path();
-
-    let borrowed_generics = cont.generics();
-    let mut generics = cont.generics().clone();
-    generics
-        .make_where_clause()
-        .predicates
-        .push(parse_quote!(#ident #borrowed_generics: #serde_path::Serialize));
-
-    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
-
-    quote! {
         impl #impl_generics VectorIntoWasmAbi for #ident #ty_generics #where_clause {
             type Abi = <JsType as VectorIntoWasmAbi>::Abi;
 
@@ -198,7 +165,6 @@ fn expand_vector_into_wasm_abi(cont: &Container) -> TokenStream {
                         // https://github.com/rustwasm/wasm-bindgen/issues/2732
                         // Until that issue is fixed, we don't directly use `unwrap_throw()` and instead build our
                         // own error message.
-                        // Convert to `value.into_js().unwrap_throw().into()` when fixed.
                         match value.into_js() {
                         Ok(js) => js.into(),
                         Err(err) => {
@@ -273,23 +239,7 @@ fn expand_from_wasm_abi(cont: &Container) -> TokenStream {
                 SelfOwner(result.unwrap_throw())
             }
         }
-    }
-}
 
-fn expand_vector_from_wasm_abi(cont: &Container) -> TokenStream {
-    let ident = cont.ident();
-    let serde_path = cont.serde_container.attrs.serde_path();
-
-    let mut generics = cont.generics().clone();
-
-    generics
-        .make_where_clause()
-        .predicates
-        .push(parse_quote!(Self: #serde_path::de::DeserializeOwned));
-
-    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
-
-    quote! {
         impl #impl_generics VectorFromWasmAbi for #ident #ty_generics #where_clause {
             type Abi = <JsType as VectorFromWasmAbi>::Abi;
 
