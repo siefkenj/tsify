@@ -1,5 +1,8 @@
 # tsify-next Changelog
 
+## v0.5.6
+- Deprecate in favor of `tsify`. The main `tsify` project now has all changes from `tsify-next` merged in.
+
 ## v0.5.5
 
 - Don't assume a struct named `Range` is automatically a `Range` type

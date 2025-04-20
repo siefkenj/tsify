@@ -1,3 +1,7 @@
+# (Deprecated)
+
+[Tsify](https://github.com/madonoharu/tsify) now has all the features of `tsify-next`; `tsify-next` has served its purpose and will no longer receive updates. Use `tsify` instead.
+
 # Tsify-next
 
 Tsify-next is a library for generating TypeScript definitions from Rust code. The original [Tsify](https://github.com/madonoharu/tsify) appears to be in hibernation mode. This repository will maintain updates until main Tsify project comes back to life.
