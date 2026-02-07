@@ -65,7 +65,17 @@ const _: () = {
                         )
                     });
                     {
-                        ::core::panicking::panic_display(&msg);
+                        #[cold]
+                        #[track_caller]
+                        #[inline(never)]
+                        #[rustc_const_panic_str]
+                        #[rustc_do_not_const_check]
+                        const fn panic_cold_display<T: ::core::fmt::Display>(
+                            arg: &T,
+                        ) -> ! {
+                            ::core::panicking::panic_display(arg)
+                        }
+                        panic_cold_display(&msg);
                     };
                 }
             }
@@ -112,7 +122,17 @@ const _: () = {
                         )
                     });
                     {
-                        ::core::panicking::panic_display(&msg);
+                        #[cold]
+                        #[track_caller]
+                        #[inline(never)]
+                        #[rustc_const_panic_str]
+                        #[rustc_do_not_const_check]
+                        const fn panic_cold_display<T: ::core::fmt::Display>(
+                            arg: &T,
+                        ) -> ! {
+                            ::core::panicking::panic_display(arg)
+                        }
+                        panic_cold_display(&msg);
                     };
                 }
             }
@@ -141,7 +161,17 @@ const _: () = {
                             )
                         });
                         {
-                            ::core::panicking::panic_display(&msg);
+                            #[cold]
+                            #[track_caller]
+                            #[inline(never)]
+                            #[rustc_const_panic_str]
+                            #[rustc_do_not_const_check]
+                            const fn panic_cold_display<T: ::core::fmt::Display>(
+                                arg: &T,
+                            ) -> ! {
+                                ::core::panicking::panic_display(arg)
+                            }
+                            panic_cold_display(&msg);
                         };
                     }
                 })
@@ -282,7 +312,17 @@ const _: () = {
                         )
                     });
                     {
-                        ::core::panicking::panic_display(&msg);
+                        #[cold]
+                        #[track_caller]
+                        #[inline(never)]
+                        #[rustc_const_panic_str]
+                        #[rustc_do_not_const_check]
+                        const fn panic_cold_display<T: ::core::fmt::Display>(
+                            arg: &T,
+                        ) -> ! {
+                            ::core::panicking::panic_display(arg)
+                        }
+                        panic_cold_display(&msg);
                     };
                 }
             }
@@ -329,7 +369,17 @@ const _: () = {
                         )
                     });
                     {
-                        ::core::panicking::panic_display(&msg);
+                        #[cold]
+                        #[track_caller]
+                        #[inline(never)]
+                        #[rustc_const_panic_str]
+                        #[rustc_do_not_const_check]
+                        const fn panic_cold_display<T: ::core::fmt::Display>(
+                            arg: &T,
+                        ) -> ! {
+                            ::core::panicking::panic_display(arg)
+                        }
+                        panic_cold_display(&msg);
                     };
                 }
             }
@@ -358,7 +408,17 @@ const _: () = {
                             )
                         });
                         {
-                            ::core::panicking::panic_display(&msg);
+                            #[cold]
+                            #[track_caller]
+                            #[inline(never)]
+                            #[rustc_const_panic_str]
+                            #[rustc_do_not_const_check]
+                            const fn panic_cold_display<T: ::core::fmt::Display>(
+                                arg: &T,
+                            ) -> ! {
+                                ::core::panicking::panic_display(arg)
+                            }
+                            panic_cold_display(&msg);
                         };
                     }
                 })
